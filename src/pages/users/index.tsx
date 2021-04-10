@@ -18,45 +18,14 @@ import {
 import Link from "next/link";
 import React from "react";
 import { RiAddLine, RiPencilLine } from "react-icons/ri";
-import { useQuery } from "react-query";
 import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
 import { Sidebar } from "../../components/Sidebar";
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  createdAt: string;
-}
+import { useUsers } from "../../services/hooks/UseUsers";
 
 export default function UserList() {
   //
-  const { isLoading, error, data } = useQuery(
-    "users",
-    async () => {
-      const response = await fetch("http://localhost:3000/api/users");
-      const data = await response.json();
-
-      const users: User[] = data.users.map((user: User) => {
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          createdAt: new Date(user.createdAt).toLocaleDateString("pt-BR", {
-            day: "2-digit",
-            month: "long",
-            year: "numeric",
-          }),
-        };
-      });
-
-      return users;
-    },
-    {
-      staleTime: 1000 * 5, // 5 segundos
-    }
-  );
+  const { isLoading, error, data, isFetching } = useUsers();
 
   const isWideVersion = useBreakpointValue({ base: false, lg: true });
 
@@ -85,7 +54,10 @@ export default function UserList() {
           >
             <Flex mb="8" justify="space-between" align="center">
               <Heading size="lg" fontWeight="normal">
-                Usuários
+                Usuários{" "}
+                {!isLoading && isFetching && (
+                  <Spinner sm="sm" color="gray.500" ml="4" />
+                )}
               </Heading>
               <Link href="/users/create" passHref>
                 <Button

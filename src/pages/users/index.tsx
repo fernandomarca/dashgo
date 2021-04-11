@@ -20,6 +20,7 @@ import { GetServerSideProps } from "next";
 import NextLink from "next/link";
 import React, { useState } from "react";
 import { RiAddLine, RiPencilLine } from "react-icons/ri";
+import { UseQueryOptions } from "react-query";
 import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
 import { Sidebar } from "../../components/Sidebar";
@@ -27,7 +28,19 @@ import { api } from "../../services/api";
 import { getUsers, useUsers } from "../../services/hooks/UseUsers";
 import { queryClient } from "../../services/queryChient";
 
-export default function UserList({ users }) {
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  created_at: string;
+}
+
+interface GetUserResponse {
+  totalCount: number;
+  users: User[];
+}
+
+export default function UserList({ users }: GetUserResponse) {
   //
   const [page, setPage] = useState(1);
   const { isLoading, error, data, isFetching } = useUsers(page, {
@@ -144,7 +157,7 @@ export default function UserList({ users }) {
                                 </Text>
                               </Box>
                             </Td>
-                            {isWideVersion && <Td>{user.createdAt} </Td>}
+                            {isWideVersion && <Td>{user.created_at} </Td>}
                             <Td>
                               <Button
                                 as="a"

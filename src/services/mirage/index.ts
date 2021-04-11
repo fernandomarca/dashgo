@@ -6,6 +6,8 @@ import {
   Response,
   ActiveModelSerializer,
 } from "miragejs";
+
+//
 type User = {
   name: string;
   email: string;
@@ -43,7 +45,7 @@ export function makeServer() {
     },
 
     seeds(server) {
-      server.createList("user", 200);
+      server.createList("user", 20);
     },
 
     routes() {
@@ -61,9 +63,10 @@ export function makeServer() {
         const pageEnd = pageStart + Number(per_page);
         //pageEnd = 20 + 10 = 30
 
-        const users = this.serialize(schema.all("user"))
-          .users.sort((a, b) => a.createdAt - b.createdAt)
-          .slice(pageStart, pageEnd);
+        const users = this.serialize(schema.all("user")).users.slice(
+          pageStart,
+          pageEnd
+        );
 
         return new Response(200, { "x-total-count": String(total) }, { users });
       });

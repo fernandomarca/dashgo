@@ -20,7 +20,7 @@ import { GetServerSideProps } from "next";
 import NextLink from "next/link";
 import React, { useState } from "react";
 import { RiAddLine, RiPencilLine } from "react-icons/ri";
-import { UseQueryOptions } from "react-query";
+import { dehydrate } from "react-query/hydration";
 import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
 import { Sidebar } from "../../components/Sidebar";
@@ -44,7 +44,7 @@ export default function UserList({ users }: GetUserResponse) {
   //
   const [page, setPage] = useState(1);
   const { isLoading, error, data, isFetching } = useUsers(page, {
-    initialData: users,
+    //initialData: users,
   });
 
   const isWideVersion = useBreakpointValue({ base: false, lg: true });
@@ -191,12 +191,16 @@ export default function UserList({ users }: GetUserResponse) {
     </>
   );
 }
-// export const getServerSideProps: GetServerSideProps = async () => {
-//   const { users, totalCount } = await getUsers(1);
+export const getServerSideProps: GetServerSideProps = async () => {
+  //const { users, totalCount } = await getUsers(1);
 
-//   return {
-//     props: {
-//       users,
-//     },
-//   };
-// };
+  await queryClient.prefetchQuery("users", () => getUsers(1), {
+    staleTime: Infinity,
+  });
+
+  return {
+    props: {
+      dehydratedState: dehydrate(queryClient),
+    },
+  };
+};
